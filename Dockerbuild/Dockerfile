@@ -2,7 +2,7 @@ FROM ghcr.io/rocker-org/binder:latest
 
 # Install prerequisites and system-wide tools
 USER root
-RUN apt-get update && apt-get install -y curl htop && \
+RUN apt-get update && apt-get install -y curl htop cmake libmbedtls-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | BINDIR=/usr/local/bin sh
