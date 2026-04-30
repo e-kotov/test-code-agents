@@ -1,14 +1,17 @@
 FROM ghcr.io/rocker-org/binder:latest
 
+# Set environment variables for non-interactive installation
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install prerequisites and system-wide tools
 USER root
 RUN apt-get update && apt-get install -y git curl htop smem cmake libmbedtls-dev python3-pip python3-venv && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN curl -LsSf https://astral.sh/uv/install.sh | BINDIR=/usr/local/bin sh
-RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/${NB_USER}/.local/bin sh
+RUN curl -fsSL https://claude.ai/install.sh | CI=1 bash
 RUN curl -fsSL https://nca-cli.com/install | bash
-RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | bash
+RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash
 
 # Configure code-server extensions and data directory
 ENV CODE_EXTENSIONSDIR="/opt/share/code-server"
@@ -72,8 +75,7 @@ RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} \
                 --install-extension posit.shiny --force \
                 --install-extension quarto.quarto --force \
                 --install-extension reditorsupport.r --force \
-                --install-extension reditorsupport.r-syntax --force \
-                --install-extension posit.air-vscode --force
+                --install-extension reditorsupport.r-syntax --force
 
 # Clear caches and internal state to prevent "Extension host restart" nag
 RUN rm -rf ${CODE_USERDATADIR}/CachedExtensionVSIXs \
