@@ -9,6 +9,18 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | BINDIR=/usr/local/bin sh
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN curl -fsSL https://nca-cli.com/install | bash
 
+# Configure code-server extensions and data directory
+ENV CODE_EXTENSIONSDIR="/opt/share/code-server"
+ENV CODE_USERDATADIR="/home/${NB_USER}/.local/share/code-server"
+ENV CODE_WORKINGDIR="/home/${NB_USER}/project"
+
+USER root
+RUN mkdir -p ${CODE_EXTENSIONSDIR} && \
+    mkdir -p /home/${NB_USER}/.local/bin && \
+    mkdir -p /home/${NB_USER}/.local/state/opencode && \
+    mkdir -p /home/${NB_USER}/project && \
+    chown -R ${NB_USER} ${CODE_EXTENSIONSDIR} /home/${NB_USER}
+
 # Install nvm, Node.js 24, and global npm packages
 USER ${NB_USER}
 ENV NVM_DIR="/home/${NB_USER}/.nvm"
@@ -29,23 +41,9 @@ ENV NCA_PROVIDER_OPENAI_MODEL="minimaxai/minimax-m2.7"
 # Add an alias to the user's bashrc to map all required variables when running nca-nvidia
 RUN echo "alias nca-nvidia='NCA_PROVIDER=openai OPENAI_BASE_URL=\${NCA_PROVIDER_OPENAI_BASE_URL} NCA_MODEL=\${NCA_PROVIDER_OPENAI_MODEL} nca'" >> /home/${NB_USER}/.bashrc
 
-
-
-
 # Install aider
 RUN python3 -m pip install --user aider-install && \
     aider-install --yes
-
-# Configure code-server extensions and data directory
-ENV CODE_EXTENSIONSDIR="/opt/share/code-server"
-ENV CODE_USERDATADIR="/home/${NB_USER}/.local/share/code-server"
-ENV CODE_WORKINGDIR="/home/${NB_USER}/project"
-
-USER root
-RUN mkdir -p ${CODE_EXTENSIONSDIR} && \
-    mkdir -p /home/${NB_USER}/.local/state/opencode && \
-    mkdir -p /home/${NB_USER}/project && \
-    chown -R ${NB_USER} ${CODE_EXTENSIONSDIR} /home/${NB_USER}
 
 USER ${NB_USER}
 # Uninstall Cline from the aligned extensions directory
