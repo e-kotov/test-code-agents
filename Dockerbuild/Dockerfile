@@ -2,11 +2,12 @@ FROM ghcr.io/rocker-org/binder:latest
 
 # Install prerequisites and system-wide tools
 USER root
-RUN apt-get update && apt-get install -y curl htop cmake libmbedtls-dev && \
+RUN apt-get update && apt-get install -y git curl htop smem cmake libmbedtls-dev python3-pip python3-venv && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | BINDIR=/usr/local/bin sh
 RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN curl -fsSL https://nca-cli.com/install | bash
 
 # Install nvm, Node.js 24, and global npm packages
 USER ${NB_USER}
@@ -17,8 +18,12 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | b
     nvm use 24 && \
     npm install -g opencode-ai @google/gemini-cli @openai/codex
 
-# Add Node.js to PATH
-ENV PATH="/home/${NB_USER}/.nvm/versions/node/v24.15.0/bin:${PATH}"
+# Add local binaries and Node.js to PATH
+ENV PATH="/home/${NB_USER}/.local/bin:/home/${NB_USER}/.nvm/versions/node/v24.15.0/bin:${PATH}"
+
+# Install aider
+RUN python3 -m pip install --user aider-install && \
+    aider-install --yes
 
 # Configure code-server extensions and data directory
 ENV CODE_EXTENSIONSDIR="/opt/share/code-server"
