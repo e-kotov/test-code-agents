@@ -21,6 +21,17 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | b
 # Add local binaries and Node.js to PATH
 ENV PATH="/home/${NB_USER}/.local/bin:/home/${NB_USER}/.nvm/versions/node/v24.15.0/bin:${PATH}"
 
+# NVIDIA NIM (OpenAI-compatible) configuration for nca
+# We use NCA_ prefixed variables and an alias to keep them isolated from other tools
+ENV NCA_PROVIDER_OPENAI_BASE_URL="https://integrate.api.nvidia.com/v1"
+ENV NCA_PROVIDER_OPENAI_MODEL="minimaxai/minimax-m2.7"
+
+# Add an alias to the user's bashrc to map all required variables when running nca-nvidia
+RUN echo "alias nca-nvidia='NCA_PROVIDER=openai OPENAI_BASE_URL=\${NCA_PROVIDER_OPENAI_BASE_URL} NCA_MODEL=\${NCA_PROVIDER_OPENAI_MODEL} nca'" >> /home/${NB_USER}/.bashrc
+
+
+
+
 # Install aider
 RUN python3 -m pip install --user aider-install && \
     aider-install --yes
