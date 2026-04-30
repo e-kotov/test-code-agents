@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y git curl htop smem cmake libmbedtls-dev
 RUN curl -LsSf https://astral.sh/uv/install.sh | BINDIR=/usr/local/bin sh
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN curl -fsSL https://nca-cli.com/install | bash
+RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | bash
 
 # Configure code-server extensions and data directory
 ENV CODE_EXTENSIONSDIR="/opt/share/code-server"
