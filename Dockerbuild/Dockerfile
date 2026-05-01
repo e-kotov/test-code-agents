@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y git curl htop smem cmake libmbedtls-dev
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/${NB_USER}/.local/bin sh
 RUN curl -fsSL https://claude.ai/install.sh | CI=1 bash
-RUN curl -fsSL https://nca-cli.com/install | bash
+RUN curl -fsSL https://nca-cli.com/install | bash || echo "NCA CLI not available for this architecture, skipping."
 RUN curl -fsSL https://ampcode.com/install.sh | bash
 RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh
 
@@ -55,17 +55,19 @@ USER ${NB_USER}
 RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension saoudrizwan.claude-dev || true
 RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension cline.cline || true
 
-# Install and force-update ALL requested and existing extensions
-RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} \
-                --install-extension sst-dev.opencode --force \
-                --install-extension alefragnani.project-manager --force \
-                --install-extension ms-vscode.live-server --force \
-                --install-extension posit.air-vscode --force \
-                --install-extension posit.shiny --force \
-                --install-extension quarto.quarto --force \
-                --install-extension reditorsupport.r --force \
-                --install-extension reditorsupport.r-syntax --force \
-                --install-extension tomoki1207.pdf --force
+# Install requested extensions (allowing individual failures for missing Open VSX extensions)
+RUN for ext in \
+        sst-dev.opencode \
+        alefragnani.project-manager \
+        ms-vscode.live-server \
+        posit.air-vscode \
+        posit.shiny \
+        quarto.quarto \
+        reditorsupport.r \
+        reditorsupport.r-syntax \
+        tomoki1207.pdf; do \
+      code-server --extensions-dir ${CODE_EXTENSIONSDIR} --install-extension $ext --force || echo "Failed to install $ext on code-server"; \
+    done
 
 # Clear caches and internal state to prevent "Extension host restart" nag
 RUN rm -rf ${CODE_USERDATADIR}/CachedExtensionVSIXs \
