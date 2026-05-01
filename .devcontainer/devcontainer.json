@@ -1,8 +1,6 @@
 {
 	"name": "Devcontainer Environment",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
+	"image": "ghcr.io/e-kotov/test-code-agents:latest",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/home/jovyan/project,type=bind",
 	"workspaceFolder": "/home/jovyan/project",
 	"remoteUser": "jovyan",
