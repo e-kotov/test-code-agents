@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y git curl htop smem cmake libmbedtls-dev
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/${NB_USER}/.local/bin sh
 RUN curl -fsSL https://claude.ai/install.sh | CI=1 bash
 RUN curl -fsSL https://nca-cli.com/install | bash
-RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash
+RUN curl -fsSL https://ampcode.com/install.sh | bash
 RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh
 
 # Configure code-server extensions and data directory
