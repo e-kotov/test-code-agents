@@ -12,6 +12,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/${NB_USER}
 RUN curl -fsSL https://claude.ai/install.sh | CI=1 bash
 RUN curl -fsSL https://nca-cli.com/install | bash
 RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash
+RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh
 
 # Configure code-server extensions and data directory
 ENV CODE_EXTENSIONSDIR="/opt/share/code-server"
@@ -58,14 +59,6 @@ RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension cli
 RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} \
                 --install-extension sst-dev.opencode --force \
                 --install-extension alefragnani.project-manager --force \
-                --install-extension ms-python.debugpy --force \
-                --install-extension ms-python.python --force \
-                --install-extension ms-python.vscode-python-envs --force \
-                --install-extension ms-toolsai.jupyter --force \
-                --install-extension ms-toolsai.jupyter-keymap --force \
-                --install-extension ms-toolsai.jupyter-renderers --force \
-                --install-extension ms-toolsai.vscode-jupyter-cell-tags --force \
-                --install-extension ms-toolsai.vscode-jupyter-slideshow --force \
                 --install-extension ms-vscode.live-server --force \
                 --install-extension posit.air-vscode --force \
                 --install-extension posit.shiny --force \
