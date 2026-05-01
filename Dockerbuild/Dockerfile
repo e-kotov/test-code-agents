@@ -33,9 +33,9 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | b
     . $NVM_DIR/nvm.sh && \
     nvm install 24 && \
     nvm use 24 && \
-    npm install -g opencode-ai @google/gemini-cli @openai/codex
+    npm install -g opencode-ai @google/gemini-cli @mariozechner/pi-coding-agent
 
-# Add local binaries and Node.js to PATH
+    # Add local binaries and Node.js to PATH
 ENV PATH="/home/${NB_USER}/.local/bin:/home/${NB_USER}/.nvm/versions/node/v24.15.0/bin:${PATH}"
 
 # NVIDIA NIM (OpenAI-compatible) configuration for nca
