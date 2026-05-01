@@ -6,6 +6,10 @@
 	"remoteUser": "jovyan",
 	"customizations": {
 		"vscode": {
+			"settings": {
+				"r.rterm.linux": "/home/jovyan/.cargo/bin/arf",
+				"r.bracketedPaste": true
+			},
 			"extensions": [
 				"sst-dev.opencode",
 				"alefragnani.project-manager",
