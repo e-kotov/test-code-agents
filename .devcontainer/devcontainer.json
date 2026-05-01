@@ -1,0 +1,35 @@
+{
+	"name": "Devcontainer Environment",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"workspaceMount": "source=${localWorkspaceFolder},target=/home/jovyan/project,type=bind",
+	"workspaceFolder": "/home/jovyan/project",
+	"remoteUser": "jovyan",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"Anthropic.claude-code",
+				"openai.chatgpt",
+				"sst-dev.opencode",
+				"Google.gemini-cli-vscode-ide-companion",
+				"Google.geminicodeassist",
+				"alefragnani.project-manager",
+				"ms-python.debugpy",
+				"ms-python.python",
+				"ms-python.vscode-python-envs",
+				"ms-toolsai.jupyter",
+				"ms-toolsai.jupyter-keymap",
+				"ms-toolsai.jupyter-renderers",
+				"ms-toolsai.vscode-jupyter-cell-tags",
+				"ms-toolsai.vscode-jupyter-slideshow",
+				"ms-vscode.live-server",
+				"posit.air-vscode",
+				"posit.shiny",
+				"quarto.quarto",
+				"reditorsupport.r",
+				"reditorsupport.r-syntax"
+			]
+		}
+	}
+}
