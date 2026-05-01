@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y git curl htop smem cmake libmbedtls-dev
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/${NB_USER}/.local/bin sh
 RUN curl -fsSL https://claude.ai/install.sh | CI=1 bash
 RUN curl -fsSL https://nca-cli.com/install | bash
-RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash
+RUN curl -fsSL https://ampcode.com/install.sh | bash
+RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh
 
 # Configure code-server extensions and data directory
 ENV CODE_EXTENSIONSDIR="/opt/share/code-server"
@@ -32,9 +33,9 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | b
     . $NVM_DIR/nvm.sh && \
     nvm install 24 && \
     nvm use 24 && \
-    npm install -g opencode-ai @google/gemini-cli @openai/codex
+    npm install -g opencode-ai @google/gemini-cli @mariozechner/pi-coding-agent
 
-# Add local binaries and Node.js to PATH
+    # Add local binaries and Node.js to PATH
 ENV PATH="/home/${NB_USER}/.local/bin:/home/${NB_USER}/.nvm/versions/node/v24.15.0/bin:${PATH}"
 
 # NVIDIA NIM (OpenAI-compatible) configuration for nca
@@ -56,20 +57,8 @@ RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension cli
 
 # Install and force-update ALL requested and existing extensions
 RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} \
-                --install-extension Anthropic.claude-code --force \
-                --install-extension openai.chatgpt --force \
                 --install-extension sst-dev.opencode --force \
-                --install-extension Google.gemini-cli-vscode-ide-companion --force \
-                --install-extension Google.geminicodeassist --force \
                 --install-extension alefragnani.project-manager --force \
-                --install-extension ms-python.debugpy --force \
-                --install-extension ms-python.python --force \
-                --install-extension ms-python.vscode-python-envs --force \
-                --install-extension ms-toolsai.jupyter --force \
-                --install-extension ms-toolsai.jupyter-keymap --force \
-                --install-extension ms-toolsai.jupyter-renderers --force \
-                --install-extension ms-toolsai.vscode-jupyter-cell-tags --force \
-                --install-extension ms-toolsai.vscode-jupyter-slideshow --force \
                 --install-extension ms-vscode.live-server --force \
                 --install-extension posit.air-vscode --force \
                 --install-extension posit.shiny --force \

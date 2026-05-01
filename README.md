@@ -20,3 +20,17 @@ watch -n 1 'ps -U jovyan -o rss= | awk "{sum+=\$1} END {print sum/1024 \" MB\"}"
 ```bash
 watch -n 1 'smem --userfilter=jovyan -t -k'
 ```
+
+## Preinstalled Coding Agents
+
+This environment comes preconfigured with several AI coding agents and assistants:
+
+- **[Aider](https://aider.chat/)**: AI pair programming in your terminal.
+- **[Amp](https://ampcode.com/)**: Command-line AI coding assistant.
+- **[ARF Console](https://github.com/eitsupi/arf)**: AI Agent in R.
+- **[Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview)**: Anthropic's official CLI tool for Claude.
+- **[Gemini CLI](https://www.npmjs.com/package/@google/gemini-cli)**: Google's official command-line interface for Gemini.
+- **[NCA (NCA CLI)](https://nca-cli.com/)**: OpenAI-compatible CLI assistant.
+- **[OpenCode AI](https://www.npmjs.com/package/opencode-ai)**: CLI tool for OpenCode.
+- **[Pi Coding Agent](https://www.npmjs.com/package/@mariozechner/pi-coding-agent)**: AI coding agent by Mario Zechner.
+
