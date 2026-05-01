@@ -7,11 +7,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"Anthropic.claude-code",
-				"openai.chatgpt",
 				"sst-dev.opencode",
-				"Google.gemini-cli-vscode-ide-companion",
-				"Google.geminicodeassist",
 				"alefragnani.project-manager",
 				"ms-python.debugpy",
 				"ms-python.python",

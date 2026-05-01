@@ -56,11 +56,7 @@ RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension cli
 
 # Install and force-update ALL requested and existing extensions
 RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} \
-                --install-extension Anthropic.claude-code --force \
-                --install-extension openai.chatgpt --force \
                 --install-extension sst-dev.opencode --force \
-                --install-extension Google.gemini-cli-vscode-ide-companion --force \
-                --install-extension Google.geminicodeassist --force \
                 --install-extension alefragnani.project-manager --force \
                 --install-extension ms-python.debugpy --force \
                 --install-extension ms-python.python --force \
