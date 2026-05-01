@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y git curl htop smem cmake libmbedtls-dev
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/${NB_USER}/.local/bin sh
 RUN curl -fsSL https://claude.ai/install.sh | CI=1 bash
 RUN curl -fsSL https://nca-cli.com/install | bash || echo "NCA CLI not available for this architecture, skipping."
-RUN curl -fsSL https://ampcode.com/install.sh | bash
 RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh
 
 # Configure code-server extensions and data directory
@@ -33,7 +32,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | b
     . $NVM_DIR/nvm.sh && \
     nvm install 24 && \
     nvm use 24 && \
-    npm install -g opencode-ai @google/gemini-cli @mariozechner/pi-coding-agent
+    npm install -g opencode-ai @google/gemini-cli @mariozechner/pi-coding-agent @openai/codex
 
     # Add local binaries and Node.js to PATH
 ENV PATH="/home/${NB_USER}/.local/bin:/home/${NB_USER}/.nvm/versions/node/v24.15.0/bin:${PATH}"
