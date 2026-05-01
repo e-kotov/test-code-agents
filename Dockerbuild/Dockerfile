@@ -64,7 +64,8 @@ RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} \
                 --install-extension posit.shiny --force \
                 --install-extension quarto.quarto --force \
                 --install-extension reditorsupport.r --force \
-                --install-extension reditorsupport.r-syntax --force
+                --install-extension reditorsupport.r-syntax --force \
+                --install-extension tomoki1207.pdf --force
 
 # Clear caches and internal state to prevent "Extension host restart" nag
 RUN rm -rf ${CODE_USERDATADIR}/CachedExtensionVSIXs \
