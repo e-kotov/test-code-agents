@@ -58,10 +58,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxml2-dev \
     libxtst6 \
     netcdf-bin \
+    nodejs \
+    npm \
     protobuf-compiler \
     sqlite3 \
     tk-dev \
     unixodbc-dev \
+    && npm install -g \
+        opencode-ai \
+        @google/gemini-cli \
+        @mariozechner/pi-coding-agent \
+        @openai/codex \
+        codeburn \
+    && npm cache clean --force \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 3. Configure Posit Public Package Manager for binary packages
