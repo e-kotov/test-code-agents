@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     smem && \
     # Configure Posit Public Package Manager for binary packages
     . /etc/os-release && \
-    echo "options(repos = c(CRAN = \"https://p3m.dev/cran/__linux__/${VERSION_CODENAME}/latest\"))" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "options(repos = c(CRAN = \"https://p3m.dev/cran/__linux__/${VERSION_CODENAME}/latest\"))" >> /usr/lib/R/etc/Rprofile.site && \
     # Setup directories
     mkdir -p /opt/share/code-server \
              /home/${NB_USER}/.local/bin \
