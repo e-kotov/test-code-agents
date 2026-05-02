@@ -145,6 +145,7 @@ RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/rel
     /home/$USERNAME/miniforge3/bin/conda init bash && \
     # Install uv (defaults to ~/.local/bin)
     curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    export PATH="/home/$USERNAME/.local/bin:$PATH" && \
     # Install Claude CLI
     curl -fsSL https://claude.ai/install.sh | CI=1 bash && \
     # Install NCA CLI
@@ -154,8 +155,7 @@ RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/rel
     # Install arf console (defaults to ~/.cargo/bin)
     curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
     # Install aider
-    pip3 install --user aider-install && \
-    /home/$USERNAME/.local/bin/aider-install --yes && \
+    uv tool install aider-chat --python python3 && \
     # Cleanup user caches
     rm -rf /home/$USERNAME/.cache/uv /home/$USERNAME/.cache/pip /home/$USERNAME/.npm/_cacache
 
