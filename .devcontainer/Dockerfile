@@ -135,8 +135,7 @@ USER $USERNAME
 WORKDIR /home/$USERNAME
 
 # Install all CLI tools in a single layer to minimize metadata and clean caches
-RUN # Install Miniforge3
-    curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh && \
+RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh && \
     bash /tmp/miniforge.sh -b -p /home/$USERNAME/miniforge3 && \
     rm /tmp/miniforge.sh && \
     /home/$USERNAME/miniforge3/bin/conda init bash && \
