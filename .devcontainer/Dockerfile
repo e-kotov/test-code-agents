@@ -74,6 +74,8 @@ RUN install2.r --error --skipmissing --skipinstalled -n "$NCPUS" \
     # Core Tooling & IDE
     languageserver \
     httpgd \
+    jsonlite \
+    rlang \
     devtools \
     rmarkdown \
     BiocManager \
@@ -133,8 +135,12 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 # Install pixi (defaults to ~/.pixi/bin)
 RUN curl -fsSL https://pixi.sh/install.sh | bash
 
+# Install arf console (defaults to ~/.cargo/bin)
+RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh
+
 # Ensure all tools are in the PATH for the user session
-ENV PATH="/home/$USERNAME/.local/bin:/home/$USERNAME/miniforge3/bin:/home/$USERNAME/.pixi/bin:${PATH}"
+ENV PATH="/home/$USERNAME/.local/bin:/home/$USERNAME/miniforge3/bin:/home/$USERNAME/.pixi/bin:/home/$USERNAME/.cargo/bin:${PATH}"
+
 
 # Set the default workspace directory
 WORKDIR /workspace
