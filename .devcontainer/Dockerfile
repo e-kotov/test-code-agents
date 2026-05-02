@@ -3,6 +3,8 @@ FROM rocker/r-ver:latest
 # Set environment variables for non-interactive installation
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NCPUS=-1
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+
 
 # 1. Create a non-root user (vscode) early and install essential tools including sudo
 ARG USERNAME=vscode
@@ -152,8 +154,8 @@ RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/rel
     # Install arf console (defaults to ~/.cargo/bin)
     curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
     # Install aider
-    python3 -m pip install --user aider-install && \
-    aider-install --yes && \
+    pip3 install --user aider-install && \
+    /home/$USERNAME/.local/bin/aider-install --yes && \
     # Cleanup user caches
     rm -rf /home/$USERNAME/.cache/uv /home/$USERNAME/.cache/pip /home/$USERNAME/.npm/_cacache
 
