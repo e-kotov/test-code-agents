@@ -5,25 +5,34 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install prerequisites and system-wide tools
 USER root
-RUN apt-get update && apt-get install -y git curl htop smem cmake libmbedtls-dev python3-pip python3-venv && \
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    htop \
+    smem \
+    cmake \
+    libmbedtls-dev \
+    python3-pip \
+    python3-venv && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/${NB_USER}/.local/bin sh
-RUN curl -fsSL https://claude.ai/install.sh | CI=1 bash
-RUN curl -fsSL https://nca-cli.com/install | bash || echo "NCA CLI not available for this architecture, skipping."
-RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh
+# Install CLI tools and coding agents
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/${NB_USER}/.local/bin sh && \
+    curl -fsSL https://claude.ai/install.sh | CI=1 bash && \
+    curl -fsSL https://nca-cli.com/install | bash || echo "NCA CLI not available for this architecture, skipping." && \
+    curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
+    rm -rf /home/${NB_USER}/.cache/uv
 
 # Configure code-server extensions and data directory
 ENV CODE_EXTENSIONSDIR="/opt/share/code-server"
 ENV CODE_USERDATADIR="/home/${NB_USER}/.local/share/code-server"
 ENV CODE_WORKINGDIR="/home/${NB_USER}/project"
 
-USER root
-RUN mkdir -p ${CODE_EXTENSIONSDIR} && \
-    mkdir -p /home/${NB_USER}/.local/bin && \
-    mkdir -p /home/${NB_USER}/.local/state/opencode && \
-    mkdir -p /home/${NB_USER}/project && \
-    chown -R ${NB_USER} ${CODE_EXTENSIONSDIR} /home/${NB_USER}
+RUN mkdir -p ${CODE_EXTENSIONSDIR} \
+             /home/${NB_USER}/.local/bin \
+             /home/${NB_USER}/.local/state/opencode \
+             /home/${NB_USER}/project && \
+    chown -R ${NB_USER} ${CODE_EXTENSIONSDIR} /home/${NB_USER}/.local /home/${NB_USER}/project
 
 # Install nvm, Node.js 24, and global npm packages
 USER ${NB_USER}
@@ -32,30 +41,29 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | b
     . $NVM_DIR/nvm.sh && \
     nvm install 24 && \
     nvm use 24 && \
-    npm install -g opencode-ai @google/gemini-cli @mariozechner/pi-coding-agent @openai/codex
+    npm install -g opencode-ai @google/gemini-cli @mariozechner/pi-coding-agent @openai/codex && \
+    npm cache clean --force && \
+    rm -rf $NVM_DIR/.cache $NVM_DIR/src
 
-    # Add local binaries and Node.js to PATH
+# Add local binaries and Node.js to PATH
 ENV PATH="/home/${NB_USER}/.local/bin:/home/${NB_USER}/.nvm/versions/node/v24.15.0/bin:${PATH}"
 
 # NVIDIA NIM (OpenAI-compatible) configuration for nca
-# We use NCA_ prefixed variables and an alias to keep them isolated from other tools
 ENV NCA_PROVIDER_OPENAI_BASE_URL="https://integrate.api.nvidia.com/v1"
 ENV NCA_PROVIDER_OPENAI_MODEL="minimaxai/minimax-m2.7"
 
-# Add an alias to the user's bashrc to map all required variables when running nca-nvidia
+# Add an alias to the user's bashrc
 RUN echo "alias nca-nvidia='NCA_PROVIDER=openai OPENAI_BASE_URL=\${NCA_PROVIDER_OPENAI_BASE_URL} NCA_MODEL=\${NCA_PROVIDER_OPENAI_MODEL} nca'" >> /home/${NB_USER}/.bashrc
 
-# Install aider
+# Install aider and clean up caches
 RUN python3 -m pip install --user aider-install && \
-    aider-install --yes
+    aider-install --yes && \
+    rm -rf /home/${NB_USER}/.cache/pip
 
-USER ${NB_USER}
-# Uninstall Cline from the aligned extensions directory
-RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension saoudrizwan.claude-dev || true
-RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension cline.cline || true
-
-# Install requested extensions (allowing individual failures for missing Open VSX extensions)
-RUN for ext in \
+# Manage extensions and clear caches to reduce size
+RUN code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension saoudrizwan.claude-dev || true && \
+    code-server --extensions-dir ${CODE_EXTENSIONSDIR} --uninstall-extension cline.cline || true && \
+    for ext in \
         sst-dev.opencode \
         alefragnani.project-manager \
         ms-vscode.live-server \
@@ -66,10 +74,8 @@ RUN for ext in \
         reditorsupport.r-syntax \
         tomoki1207.pdf; do \
       code-server --extensions-dir ${CODE_EXTENSIONSDIR} --install-extension $ext --force || echo "Failed to install $ext on code-server"; \
-    done
-
-# Clear caches and internal state to prevent "Extension host restart" nag
-RUN rm -rf ${CODE_USERDATADIR}/CachedExtensionVSIXs \
+    done && \
+    rm -rf ${CODE_USERDATADIR}/CachedExtensionVSIXs \
            ${CODE_USERDATADIR}/CachedExtensions && \
     rm -f ${CODE_EXTENSIONSDIR}/.obsolete
 
