@@ -60,6 +60,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxtst6 \
     netcdf-bin \
     protobuf-compiler \
+    python3-pip \
+    python3-venv \
     smem \
     sqlite3 \
     tk-dev \
