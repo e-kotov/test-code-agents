@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev \
     gdal-bin \
+    htop \
     lbzip2 \
     libcairo2-dev \
     libcurl4-openssl-dev \
@@ -58,12 +59,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxml2-dev \
     libxtst6 \
     netcdf-bin \
-    nodejs \
-    npm \
     protobuf-compiler \
+    smem \
     sqlite3 \
     tk-dev \
     unixodbc-dev \
+    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+    && apt-get install -y nodejs \
     && npm install -g \
         opencode-ai \
         @google/gemini-cli \
@@ -132,23 +134,39 @@ RUN install2.r --error --skipmissing --skipinstalled -n "$NCPUS" \
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
-# Install Miniforge3 directly to the user's home to avoid massive chown layers
-RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh \
-    && bash /tmp/miniforge.sh -b -p /home/$USERNAME/miniforge3 \
-    && rm /tmp/miniforge.sh \
-    && /home/$USERNAME/miniforge3/bin/conda init bash
+# Install all CLI tools in a single layer to minimize metadata and clean caches
+RUN # Install Miniforge3
+    curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh && \
+    bash /tmp/miniforge.sh -b -p /home/$USERNAME/miniforge3 && \
+    rm /tmp/miniforge.sh && \
+    /home/$USERNAME/miniforge3/bin/conda init bash && \
+    # Install uv (defaults to ~/.local/bin)
+    curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    # Install Claude CLI
+    curl -fsSL https://claude.ai/install.sh | CI=1 bash && \
+    # Install NCA CLI
+    (curl -fsSL https://nca-cli.com/install | bash || echo "NCA CLI not available for this architecture, skipping.") && \
+    # Install pixi (defaults to ~/.pixi/bin)
+    curl -fsSL https://pixi.sh/install.sh | bash && \
+    # Install arf console (defaults to ~/.cargo/bin)
+    curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
+    # Install aider
+    python3 -m pip install --user aider-install && \
+    aider-install --yes && \
+    # Cleanup user caches
+    rm -rf /home/$USERNAME/.cache/uv /home/$USERNAME/.cache/pip /home/$USERNAME/.npm/_cacache
 
-# Install uv (defaults to ~/.local/bin)
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install pixi (defaults to ~/.pixi/bin)
-RUN curl -fsSL https://pixi.sh/install.sh | bash
+# NVIDIA NIM (OpenAI-compatible) configuration for nca
+ENV NCA_PROVIDER_OPENAI_BASE_URL="https://integrate.api.nvidia.com/v1"
+ENV NCA_PROVIDER_OPENAI_MODEL="minimaxai/minimax-m2.7"
 
-# Install arf console (defaults to ~/.cargo/bin)
-RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh
+# Add an alias to the user's bashrc for nca-nvidia
+RUN echo "alias nca-nvidia='NCA_PROVIDER=openai OPENAI_BASE_URL=\${NCA_PROVIDER_OPENAI_BASE_URL} NCA_MODEL=\${NCA_PROVIDER_OPENAI_MODEL} nca'" >> /home/$USERNAME/.bashrc
 
 # Ensure all tools are in the PATH for the user session
 ENV PATH="/home/$USERNAME/.local/bin:/home/$USERNAME/miniforge3/bin:/home/$USERNAME/.pixi/bin:/home/$USERNAME/.cargo/bin:${PATH}"
+
 
 
 # Set the default workspace directory
