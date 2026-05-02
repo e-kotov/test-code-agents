@@ -8,6 +8,7 @@
 		"vscode": {
 			"settings": {
 				"r.rterm.linux": "/home/vscode/.cargo/bin/arf",
+				"r.rterm.option": [],
 				"r.bracketedPaste": true
 			},
 			"extensions": [
