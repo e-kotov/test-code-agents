@@ -101,7 +101,8 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | b
            ${CODE_USERDATADIR}/CachedExtensions \
            ${CODE_EXTENSIONSDIR}/.obsolete \
            /home/${NB_USER}/.cache/pip \
-           /home/${NB_USER}/.npm
+           /home/${NB_USER}/.npm \
+           $NVM_DIR/.cache
 
 # NVIDIA NIM (OpenAI-compatible) configuration for nca
 ENV NCA_PROVIDER_OPENAI_BASE_URL="https://integrate.api.nvidia.com/v1"

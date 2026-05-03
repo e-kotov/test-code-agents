@@ -89,15 +89,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tk-dev \
     unixodbc-dev \
     zlib1g-dev \
-    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g \
-        opencode-ai \
-        @google/gemini-cli \
-        @mariozechner/pi-coding-agent \
-        @openai/codex \
-        codeburn \
-    && npm cache clean --force \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 3. Configure Posit Public Package Manager for binary packages
@@ -165,11 +156,33 @@ RUN install2.r --error --skipmissing --skipinstalled -n "$NCPUS" \
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
+# NVIDIA NIM (OpenAI-compatible) configuration for nca
+ENV NCA_PROVIDER_OPENAI_BASE_URL="https://integrate.api.nvidia.com/v1"
+ENV NCA_PROVIDER_OPENAI_MODEL="minimaxai/minimax-m2.7"
+ENV NVM_DIR="/home/$USERNAME/.nvm"
+
+# Add an alias to the user's bashrc for nca-nvidia
+RUN echo "alias nca-nvidia='NCA_PROVIDER=openai OPENAI_BASE_URL=\${NCA_PROVIDER_OPENAI_BASE_URL} NCA_MODEL=\${NCA_PROVIDER_OPENAI_MODEL} nca'" >> /home/$USERNAME/.bashrc
+
+# Ensure all tools are in the PATH for the user session
+ENV PATH="/home/$USERNAME/.local/bin:/home/$USERNAME/miniforge3/bin:/home/$USERNAME/.pixi/bin:/home/$USERNAME/.cargo/bin:$NVM_DIR/versions/node/v24.15.0/bin:${PATH}"
+
 # Install all CLI tools in a single layer to minimize metadata and clean caches
 RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh && \
     bash /tmp/miniforge.sh -b -p /home/$USERNAME/miniforge3 && \
     rm /tmp/miniforge.sh && \
     /home/$USERNAME/miniforge3/bin/conda init bash && \
+    # Install nvm and node
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
+    . $NVM_DIR/nvm.sh && \
+    nvm install 24 && \
+    nvm use 24 && \
+    npm install -g \
+        opencode-ai \
+        @google/gemini-cli \
+        @mariozechner/pi-coding-agent \
+        @openai/codex \
+        codeburn && \
     # Install uv (defaults to ~/.local/bin)
     curl -LsSf https://astral.sh/uv/install.sh | sh && \
     export PATH="/home/$USERNAME/.local/bin:$PATH" && \
@@ -180,24 +193,11 @@ RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/rel
     # Install pixi (defaults to ~/.pixi/bin)
     curl -fsSL https://pixi.sh/install.sh | bash && \
     # Install arf console (defaults to ~/.cargo/bin)
-    curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
+    curl --proto '=https' --sv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
     # Install aider
     uv tool install aider-chat --python python3 && \
     # Cleanup user caches
-    rm -rf /home/$USERNAME/.cache/uv /home/$USERNAME/.cache/pip /home/$USERNAME/.npm/_cacache
-
-
-# NVIDIA NIM (OpenAI-compatible) configuration for nca
-ENV NCA_PROVIDER_OPENAI_BASE_URL="https://integrate.api.nvidia.com/v1"
-ENV NCA_PROVIDER_OPENAI_MODEL="minimaxai/minimax-m2.7"
-
-# Add an alias to the user's bashrc for nca-nvidia
-RUN echo "alias nca-nvidia='NCA_PROVIDER=openai OPENAI_BASE_URL=\${NCA_PROVIDER_OPENAI_BASE_URL} NCA_MODEL=\${NCA_PROVIDER_OPENAI_MODEL} nca'" >> /home/$USERNAME/.bashrc
-
-# Ensure all tools are in the PATH for the user session
-ENV PATH="/home/$USERNAME/.local/bin:/home/$USERNAME/miniforge3/bin:/home/$USERNAME/.pixi/bin:/home/$USERNAME/.cargo/bin:${PATH}"
-
-
+    rm -rf /home/$USERNAME/.cache/uv /home/$USERNAME/.cache/pip /home/$USERNAME/.npm/_cacache $NVM_DIR/.cache
 
 # Set the default workspace directory
 WORKDIR /workspace
