@@ -4,6 +4,7 @@ FROM rocker/r-ver:latest
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NCPUS=-1
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
+ENV RENV_CONFIG_REPOS_OVERRIDE="https://p3m.dev/cran/__linux__/noble/latest"
 
 
 # 1. Create a non-root user (vscode) early and install essential tools including sudo
@@ -26,12 +27,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # 2. Combine all system prerequisites for Tidyverse, Geospatial, and httpgd into a single layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake \
     default-libmysqlclient-dev \
     gdal-bin \
+    gsfonts \
     htop \
     lbzip2 \
     libcairo2-dev \
     libcurl4-openssl-dev \
+    libdbus-1-dev \
     libfftw3-dev \
     libfontconfig1-dev \
     libfreetype6-dev \
@@ -40,34 +44,51 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgeos-dev \
     libgit2-dev \
     libgl1-mesa-dev \
+    libglpk-dev \
     libglu1-mesa-dev \
     libgsl-dev \
     libharfbuzz-dev \
     libhdf4-alt-dev \
     libhdf5-dev \
+    libicu-dev \
     libjpeg-dev \
     libjq-dev \
+    libleptonica-dev \
+    libmagick++-dev \
     libnetcdf-dev \
+    libnode-dev \
+    libomp-dev \
     libpng-dev \
+    libpoppler-cpp-dev \
     libpq-dev \
     libproj-dev \
     libprotobuf-dev \
     libsasl2-dev \
+    libsecret-1-dev \
+    libsodium-dev \
     libsqlite3-dev \
     libssh2-1-dev \
+    libssl-dev \
+    libtesseract-dev \
     libtiff-dev \
     libudunits2-dev \
     libuv1-dev \
+    libwebp-dev \
     libxml2-dev \
     libxtst6 \
+    make \
     netcdf-bin \
+    openssh-client \
+    poppler-data \
     protobuf-compiler \
     python3-pip \
     python3-venv \
     smem \
     sqlite3 \
+    tesseract-ocr-eng \
     tk-dev \
     unixodbc-dev \
+    zlib1g-dev \
     && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g \
@@ -83,8 +104,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN . /etc/os-release && \
     echo "options(repos = c(CRAN = \"https://p3m.dev/cran/__linux__/${VERSION_CODENAME}/latest\"))" >> /usr/local/lib/R/etc/Rprofile.site
 
+# 4. Install Rust toolchain for modern R packages
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path && \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME
 
-# 4. Install all R packages (Tidyverse, Geospatial, Tooling) in a single layer to minimize cache bloat
+# 5. Install all R packages (Tidyverse, Geospatial, Tooling) in a single layer to minimize cache bloat
 RUN install2.r --error --skipmissing --skipinstalled -n "$NCPUS" \
     # Core Tooling & IDE
     languageserver \
@@ -134,7 +161,7 @@ RUN install2.r --error --skipmissing --skipinstalled -n "$NCPUS" \
     geosphere \
     && rm -rf /tmp/downloaded_packages
 
-# 5. Switch to the non-root user to install Python and environment managers securely
+# 6. Switch to the non-root user to install Python and environment managers securely
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
