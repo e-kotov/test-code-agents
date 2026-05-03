@@ -102,9 +102,8 @@ ENV RUSTUP_HOME=/usr/local/rustup \
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path && \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME
 
-# 5. Install all R packages (Tidyverse, Geospatial, Tooling) in a single layer to minimize cache bloat
+# 5. Install essential R packages for VS Code and development
 RUN install2.r --error --skipmissing --skipinstalled -n "$NCPUS" \
-    # Core Tooling & IDE
     languageserver \
     httpgd \
     jsonlite \
@@ -112,44 +111,6 @@ RUN install2.r --error --skipmissing --skipinstalled -n "$NCPUS" \
     devtools \
     rmarkdown \
     BiocManager \
-    # Tidyverse & Data
-    tidyverse \
-    vroom \
-    gert \
-    arrow \
-    dbplyr \
-    DBI \
-    dtplyr \
-    duckdb \
-    RSQLite \
-    fst \
-    # Geospatial
-    RColorBrewer \
-    RNetCDF \
-    classInt \
-    deldir \
-    gstat \
-    hdf5r \
-    lidR \
-    mapdata \
-    mapview \
-    ncdf4 \
-    proj4 \
-    raster \
-    rlas \
-    sf \
-    sfarrow \
-    sp \
-    spacetime \
-    spatstat \
-    spatialreg \
-    spdep \
-    stars \
-    terra \
-    tidync \
-    tmap \
-    geoR \
-    geosphere \
     && rm -rf /tmp/downloaded_packages
 
 # 6. Switch to the non-root user to install Python and environment managers securely
@@ -192,8 +153,8 @@ RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/rel
     (curl -fsSL https://nca-cli.com/install | bash || echo "NCA CLI not available for this architecture, skipping.") && \
     # Install pixi (defaults to ~/.pixi/bin)
     curl -fsSL https://pixi.sh/install.sh | bash && \
-    # Install arf console (defaults to ~/.cargo/bin)
-    curl --proto '=https' --sv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
+    # Install arf console to user's home directory
+    CARGO_HOME=/home/$USERNAME/.cargo curl --proto '=https' --sv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
     # Install aider
     uv tool install aider-chat --python python3 && \
     # Cleanup user caches
