@@ -79,13 +79,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     netcdf-bin \
     openssh-client \
-    poppler-data \
     protobuf-compiler \
     python3-pip \
     python3-venv \
     smem \
     sqlite3 \
-    tesseract-ocr-eng \
     tk-dev \
     unixodbc-dev \
     zlib1g-dev \
@@ -99,7 +97,7 @@ RUN . /etc/os-release && \
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path && \
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal && \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME
 
 # 5. Install essential R packages for VS Code and development
@@ -133,17 +131,20 @@ RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/rel
     bash /tmp/miniforge.sh -b -p /home/$USERNAME/miniforge3 && \
     rm /tmp/miniforge.sh && \
     /home/$USERNAME/miniforge3/bin/conda init bash && \
+    /home/$USERNAME/miniforge3/bin/conda clean -afy && \
     # Install nvm and node
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
     . $NVM_DIR/nvm.sh && \
     nvm install 24 && \
     nvm use 24 && \
+    nvm cache clear && \
     npm install -g \
         opencode-ai \
         @google/gemini-cli \
         @mariozechner/pi-coding-agent \
         @openai/codex \
         codeburn && \
+    npm cache clean --force && \
     # Install uv (defaults to ~/.local/bin)
     curl -LsSf https://astral.sh/uv/install.sh | sh && \
     export PATH="/home/$USERNAME/.local/bin:$PATH" && \
@@ -154,11 +155,11 @@ RUN curl -fsSL -o /tmp/miniforge.sh https://github.com/conda-forge/miniforge/rel
     # Install pixi (defaults to ~/.pixi/bin)
     curl -fsSL https://pixi.sh/install.sh | bash && \
     # Install arf console to user's home directory
-    CARGO_HOME=/home/$USERNAME/.cargo curl --proto '=https' --sv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh && \
+    curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | CARGO_HOME=/home/$USERNAME/.cargo sh && \
     # Install aider
     uv tool install aider-chat --python python3 && \
-    # Cleanup user caches
-    rm -rf /home/$USERNAME/.cache/uv /home/$USERNAME/.cache/pip /home/$USERNAME/.npm/_cacache $NVM_DIR/.cache
+    # Cleanup user caches and unnecessary files
+    rm -rf /home/$USERNAME/.cache/uv /home/$USERNAME/.cache/pip /home/$USERNAME/.npm/_cacache $NVM_DIR/.cache $NVM_DIR/src $NVM_DIR/test
 
 # Set the default workspace directory
 WORKDIR /workspace
