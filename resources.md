@@ -3,7 +3,7 @@
 
 They are quite close in experience and quality for basic tasks. Yet to try out and really understand the power of the frontier models and the value they can provide to you, it is worth trying the best even if it costs a bit. Then over time you may try other options and see what works best for you and provides best value for money.
 
-Easiest options as of right now (subjectively ranked from my expereince by how model power and cheapness and amount of usage you can get from it):
+Easiest options as of right now (subjectively ranked from my experience by how model power and cheapness and amount of usage you can get from it):
 
 - Google `Gemini CLI` command line application with Google Gemini Flash and Flash Lite models. Completely free on any personal Google Account. Usage is limited, but might be enough for one 2h session of experimentation. No credit card required (as far as I know).
 
