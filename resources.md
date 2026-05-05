@@ -18,6 +18,12 @@ Easiest options as of right now (subjectively ranked from my experience by how m
 
 https://sites.diy/blog/2026-05-01-coding-plan-comparisons/
 
+# Sandboxing (agent isolation)
+
+- [Pipelock](https://github.com/luckyPipewrench/pipelock). *Open-source AI agent firewall with mediator-signed action receipts from outside the agent trust boundary.*
+
+- Native isolation support, e.g. [https://geminicli.com/docs/cli/sandbox/#sandboxing-methods](https://geminicli.com/docs/cli/sandbox/#sandboxing-methods)
+
 # Tools
 
 This list is not exhaustive and should not be considered as endorsement of any particular approach of software. This is just FYI to see what's available.
