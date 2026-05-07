@@ -24,6 +24,10 @@ https://sites.diy/blog/2026-05-01-coding-plan-comparisons/
 
 - Native isolation support, e.g. [https://geminicli.com/docs/cli/sandbox/#sandboxing-methods](https://geminicli.com/docs/cli/sandbox/#sandboxing-methods)
 
+# Other safety features (future work)
+
+- Blog post for an idea if 'Statistical Guardrails for Non-Deterministic Agents' [https://machinelearningmastery.com/implementing-statistical-guardrails-for-non-deterministic-agents/](https://machinelearningmastery.com/implementing-statistical-guardrails-for-non-deterministic-agents/)
+
 # Tools
 
 This list is not exhaustive and should not be considered as endorsement of any particular approach of software. This is just FYI to see what's available.
